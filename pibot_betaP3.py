@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 import curses
 import sys, tty, termios
 sys.path.append("/usr/lib/python3/dist-packages")
+sys.path.append("/home/pi/pibot/pibot")
 import gamepad
 import os, struct, array
 from fcntl import ioctl
@@ -12,8 +13,8 @@ from evdev import ecodes, InputDevice, ff, util
 import asyncio
 import getGetch
 
-Motor_A_EN    = 7
-Motor_B_EN    = 15
+Motor_A_EN    = 7 #GPIO BORAD PIN 7
+Motor_B_EN    = 15 #GPIO BOARD PIN 15
 Motor_A_1  = 3
 Motor_A_2  = 5
 Motor_B_1  = 11
@@ -35,20 +36,20 @@ def setup():#Motor initialization
     pwm_A = 0
     pwm_B = 0
     try:
-        pwm_A = GPIO.PWM(Motor_A_EN, 250) #Set PWM Pin Outs To pin 7, 15/set pwm freq
-        pwm_B = GPIO.PWM(Motor_B_EN, 250)
+        pwm_A = GPIO.PWM(Motor_A_EN, 250) #Set Pin 7 to PWM / Set PWM freq
+        pwm_B = GPIO.PWM(Motor_B_EN, 250) #Set Pin 15 to PWM / Set Freq
     except:
         pass
-def forward(x):
-    GPIO.output(5, True)
+def forward(x):  #Forward Continuous
+    GPIO.output(5, True) 
     GPIO.output(3, False)
     GPIO.output(11, True)
     GPIO.output(13, False)
-    pwm_A.ChangeDutyCycle(100)
-    pwm_B.ChangeDutyCycle(80)
-    sleep(x)
+    pwm_A.ChangeDutyCycle(100)  #PWM_A & PWM_B DIFFERENT CYCLES TO TRY AND MATCH SPEED
+    pwm_B.ChangeDutyCycle(80)   #WOULD LIKE TO REPLACE CURRENT DC MOTORS WITH SERVO OR 
+    sleep(x)                    #ADD ENCODER FOR SYNC FEEDBACK
 
-def  reverse(x):
+def  reverse(x): #Reverse Continuous
     GPIO.output(3, True)
     GPIO.output(5, False)
     GPIO.output(13, True)
@@ -57,7 +58,7 @@ def  reverse(x):
     pwm_B.ChangeDutyCycle(80)
     sleep(x)
 
-def left():
+def left():  #Short Left Turn, Then Sleep
     GPIO.output(5, True)
     GPIO.output(3, False)
     GPIO.output(13, True)
@@ -67,7 +68,7 @@ def left():
     sleep(0.175)
     GPIO.output(allGPIO_list, False)
 
-def right():
+def right(): #Short Right Turn, Then Sleep
     GPIO.output(3, True)
     GPIO.output(5, False)
     GPIO.output(11, True)
@@ -116,6 +117,8 @@ GPIO.output(Motor_B_EN, True)
 
 getch = getGetch. _Getch()
 
+
+## FOR FUTURE XBOX ONE CONTROLLER CONNECTIVITY
 def connect(): # asyncronus read-out of events
         xbox_path = None
         remote_control = None
@@ -141,16 +144,18 @@ def is_connected(): # asyncronus read-out of events
     return True
 
 
-connect()
+"""connect()
 is_connected()
 sleep(10)
-
+"""
 
 screen = curses.initscr()
 curses.noecho()
 curses.cbreak()
 screen.keypad(True)
 
+
+##DRIVE COMMANDS INPUT FROM KEYBOARD
 try:
     while True:
         char = screen.getch()
@@ -180,10 +185,11 @@ try:
             nineT_right()
         
 finally:
-    #Close down curses properly, inc turn echo back on!
+    #Close down curses properly,  turn echo back on!
     curses.nocbreak(); screen.keypad(0); curses.echo()
     curses.endwin()
-    GPIO.cleanup()
+    GPIO.cleanup()  
+    #END OF PROGRAM
 
 
 

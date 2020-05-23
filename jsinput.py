@@ -33,13 +33,13 @@ def is_connected(): # asyncronus read-out of events
         return False
     return True
 
-async def read_gamepad_inputs():
+def read_gamepad_inputs():
 ##    global head_light_flag
     print("Ready to drive!!")
     while is_connected():
         print("Still COnnected")
-        #print(" trigger_right = ", round(remote_control.trigger_right,2),end="\r")
-        x = round(remote_control.joystick_left_x,2)
+        print(" trigger_right = ", round(remote_control.trigger_right,2),end="\r")
+##        x = round(remote_control.joystick_left_x,2)
 ##        y = round(remote_control.joystick_left_y,2)
 ##        angle = get_angle_from_coords(x,y)
 ##        if angle > 180:
@@ -75,10 +75,10 @@ async def read_gamepad_inputs():
 ##            if turn_sound.isPlaying():
 ##                turn_sound.stop()
 
-        await asyncio.sleep(100e-3) #100ms
+##        await asyncio.sleep(100e-3) #100ms
     return
 
-async def removetasks(loop):
+def removetasks(loop):
     tasks = [t for t in asyncio.all_tasks() if t is not
              asyncio.current_task()]
 
@@ -89,7 +89,7 @@ async def removetasks(loop):
         task.cancel()
 
     print("Cancelling outstanding tasks")
-    await asyncio.gather(*tasks, return_exceptions=True)
+##    await asyncio.gather(*tasks, return_exceptions=True)
     loop.stop()
 
 async def shutdown_signal(signal, loop):
@@ -97,14 +97,14 @@ async def shutdown_signal(signal, loop):
     await removetasks(loop)
 
 
-obj = gamepad()
+friend = gamepad()
 
 connect()
 sleep(0.5)
 is_connected()
 sleep(0.5)
 
-obj.read_gamepad_inputs()
+friend(read_gamepad_inputs())
 
 
 # 
