@@ -13,15 +13,15 @@ import asyncio
 
 def connect(): # asyncronus read-out of events
         xbox_path = None
-        remote_control = None
+        remote_control = 0 
         devices = [InputDevice(path) for path in list_devices()]
         print('Connecting to xbox controller...')
         for device in devices:
             if str.lower(device.name) == 'xbox wireless controller':
                 xbox_path = str(device.path)
-                #remote_control = gamepad.gamepad(file = xbox_path)
-               # remote_control.rumble_effect = 2
-                #return remote_control
+                remote_control = gamepad.gamepad(file = xbox_path)
+                remote_control.rumble_effect = 2
+                return remote_control
         return None
 
 async def is_connected(): # asyncronus read-out of events
@@ -30,56 +30,18 @@ async def is_connected(): # asyncronus read-out of events
     for device in devices:
         if str.lower(device.name) == 'xbox wireless controller':
             path = str(device.path)
-            print('Ohyeah')
+            print('Oh yeah')
     if(path == None):
         print('Xbox controller disconnected!!')
         return False
     return True
     await asyncio.sleep(5)
 
-def read_gamepad_inputs():
-##    global head_light_flag
+async def read_gamepad_inputs():
     print("Ready to drive!!")
     while is_connected():
         print("Still COnnected")
-        print(" trigger_right = ", round(remote_control.trigger_right,2),end="\r")
-##        x = round(remote_control.joystick_left_x,2)
-##        y = round(remote_control.joystick_left_y,2)
-##        angle = get_angle_from_coords(x,y)
-##        if angle > 180:
-##            angle = 360 - angle
-##        #print("x:", x, " y:", y, " angle: ",angle,end="\r")
-##        turn_head(angle)
-##        direction = get_motor_direction(x,y)
-##        #print("x:", x, " y:", y, " direction: ",direction,end="\r")
-##        drive_motor(direction,y)
-
-##        if round(remote_control.trigger_right,2) > 0.0:
-##            horn_sound.play(1.0)
-##            led.blue()
-##        elif round(remote_control.trigger_left,2) > 0.0:
-##            led.cyan()
-##        elif remote_control.bump_left:
-##            turn_sound.play(1.0)
-##            led.turn_left(5)
-##        elif remote_control.bump_right:
-##            turn_sound.play(1.0)
-##            led.turn_right(5)
-##        elif remote_control.dpad_up:
-##            remote_control.dpad_up = False
-##        elif remote_control.dpad_left:
-##            remote_control.dpad_left = False
-##        elif remote_control.dpad_right:
-##            remote_control.dpad_right = False
-##        elif remote_control.button_a:
-##            remote_control.button_a = False
-##        elif head_light_flag == False:
-##            led.both_off()
-##            led_strip.colorWipe(strip, Color(0,0,0))
-##            if turn_sound.isPlaying():
-##                turn_sound.stop()
-
-##        await asyncio.sleep(100e-3) #100ms
+        await asyncio.sleep(30)
     return
 
 def removetasks(loop):
@@ -107,11 +69,7 @@ sleep(0.5)
 Gamepad()
 loop = asyncio.get_event_loop()
 loop.run_until_complete(is_connected())
+asyncio.run(read_gamepad_inputs())
 loop.close()
-"""
-friend.load_effects()
-friend.read_gamepad_inputs()
-"""
-# 
 # 
  
