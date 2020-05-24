@@ -4,6 +4,8 @@ import RPi.GPIO as GPIO
 import curses
 import sys, tty, termios
 import gamepad
+import Gamepad
+from Gamepad import *
 import os, struct, array
 from fcntl import ioctl
 from evdev import ecodes, InputDevice, ff, util, list_devices
@@ -17,21 +19,23 @@ def connect(): # asyncronus read-out of events
         for device in devices:
             if str.lower(device.name) == 'xbox wireless controller':
                 xbox_path = str(device.path)
-                remote_control = gamepad.gamepad(file = xbox_path)
-                remote_control.rumble_effect = 2
-                return remote_control
+                #remote_control = gamepad.gamepad(file = xbox_path)
+               # remote_control.rumble_effect = 2
+                #return remote_control
         return None
 
-def is_connected(): # asyncronus read-out of events
+async def is_connected(): # asyncronus read-out of events
     path = None
     devices = [InputDevice(path) for path in list_devices()]
     for device in devices:
         if str.lower(device.name) == 'xbox wireless controller':
             path = str(device.path)
+            print('Ohyeah')
     if(path == None):
         print('Xbox controller disconnected!!')
         return False
     return True
+    await asyncio.sleep(5)
 
 def read_gamepad_inputs():
 ##    global head_light_flag
@@ -96,19 +100,18 @@ async def shutdown_signal(signal, loop):
     print(f"Received exit signal {signal.name}...")
     await removetasks(loop)
 
-
-friend = gamepad()
-
+available()
 connect()
 sleep(0.5)
-is_connected()
-sleep(0.5)
 
-friend(read_gamepad_inputs())
-
-
+Gamepad()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(is_connected())
+loop.close()
+"""
+friend.load_effects()
+friend.read_gamepad_inputs()
+"""
 # 
-# loop.close()
 # 
-# 
-# 
+ 
