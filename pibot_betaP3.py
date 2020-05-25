@@ -20,8 +20,8 @@ Motor_A_1 = 3
 Motor_A_2 = 5
 Motor_B_1 = 11
 Motor_B_2 = 13
-#Dir_forward   = 0
-#Dir_backward  = 1
+# Dir_forward   = 0
+# Dir_backward  = 1
 allGPIO_list = (3, 5, 7, 11, 13, 15)
 
 
@@ -157,13 +157,12 @@ def is_connected():  # asyncronus read-out of events
     return True
 
 
-
 screen = curses.initscr()
 curses.noecho()
 curses.cbreak()
 screen.keypad(True)
 
-##DRIVE COMMANDS INPUT FROM KEYBOARD
+#DRIVE COMMANDS INPUT FROM KEYBOARD
 try:
     while True:
         char = screen.getch()
@@ -194,8 +193,8 @@ try:
 
 finally:
     # Close down curses properly,  turn echo back on!
-    curses.nocbreak();
-    screen.keypad(0);
+    curses.nocbreak()
+    screen.keypad(0)
     curses.echo()
     curses.endwin()
     GPIO.cleanup()
