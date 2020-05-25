@@ -5,11 +5,11 @@ import curses
 import sys, tty, termios
 import gamepad
 import Gamepad
-from Gamepad import *
+import Gamepad
 import os, struct, array
 from fcntl import ioctl
 from evdev import ecodes, InputDevice, ff, util, list_devices
-import asyncio
+from asyncio import sleep, get_event_loop, current_task, all_tasks, run
 
 def connect(): # asyncronus read-out of events
         xbox_path = None
@@ -35,18 +35,18 @@ async def is_connected(): # asyncronus read-out of events
         print('Xbox controller disconnected!!')
         return False
     return True
-    await asyncio.sleep(5)
+    await sleep(5)
 
 async def read_gamepad_inputs():
     print("Ready to drive!!")
     while is_connected():
         print("Still COnnected")
-        await asyncio.sleep(30)
+        await sleep(30)
     return
 
-def removetasks(loop):
-    tasks = [t for t in asyncio.all_tasks() if t is not
-             asyncio.current_task()]
+def removetasks(loop: object) -> object:
+    tasks = [t for t in all_tasks() if t is not
+             current_task()]
 
     for task in tasks:
         # skipping over shielded coro still does not help
@@ -67,9 +67,9 @@ connect()
 sleep(0.5)
 
 Gamepad()
-loop = asyncio.get_event_loop()
+loop = get_event_loop()
 loop.run_until_complete(is_connected())
-asyncio.run(read_gamepad_inputs())
+run(read_gamepad_inputs())
 loop.close()
 # 
  
