@@ -86,7 +86,7 @@ def right():  # Short Right Turn, Then Sleep
     stopAll()
 
 
-def nineT_left():
+def left_ninety():
     GPIO.output(5, True)
     GPIO.output(3, False)
     GPIO.output(13, True)
@@ -187,7 +187,7 @@ try:
         elif char == ord('l'):
             stopAll()
         elif char == ord('1'):
-            nineT_left()
+            left_ninety()
         elif char == ord('2'):
             nineT_right()
 
