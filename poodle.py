@@ -1,6 +1,7 @@
 import gamepad
 
 from time import sleep
+gamepad.init()
 
 fart = gamepad.gamepad()
 if fart.button_x == True:
