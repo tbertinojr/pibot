@@ -8,12 +8,28 @@ import sys, tty, termios
 sys.path.append("/usr/lib/python3/dist-packages")
 sys.path.append("/home/pi/pibot/pibot")
 import gamepad
+import Gamepad
 import os, struct, array
 from fcntl import ioctl
 from evdev import ecodes, InputDevice, ff, util
 import asyncio
 import getGetch
+#import Controllers
 
+Motor_A_EN = 7  # GPIO BORAD PIN 7
+Motor_B_EN = 15  # GPIO BOARD PIN 15
+Motor_A_1 = 3
+Motor_A_2 = 5
+Motor_B_1 = 11
+Motor_B_2 = 13
+# Dir_forward   = 0
+# Dir_backward  = 1
+# global pwm_a
+# global pwm_b
+
+allGPIO_list = (3, 5, 7, 11, 13, 15)
+
+<<<<<<< HEAD
 Motor_A_EN = 7  # GPIO BORAD PIN 7
 Motor_B_EN = 15  # GPIO BOARD PIN 15
 Motor_A_1 = 3
@@ -29,6 +45,11 @@ allGPIO_list = (3, 5, 7, 11, 13, 15)
 
 
 def setup():  # Motor initialization
+=======
+
+def setup():  # Motor initialization
+    global pwm_a, pwm_b
+>>>>>>> 43d91ba4bb741748abace786ad27114a7722a92c
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(Motor_A_EN, GPIO.OUT)
@@ -53,8 +74,13 @@ def forward(x):  # Forward Continuous
     pwm_a.ChangeDutyCycle(100)  # pwm_a & pwm_b DIFFERENT CYCLES TO TRY AND MATCH SPEED
     pwm_b.ChangeDutyCycle(80)  # WOULD LIKE TO REPLACE CURRENT DC MOTORS WITH SERVO OR
     sleep(x)  # ADD ENCODER FOR SYNC FEEDBACK
+<<<<<<< HEAD
 
 
+=======
+
+
+>>>>>>> 43d91ba4bb741748abace786ad27114a7722a92c
 def reverse(x):  # Reverse Continuous
     GPIO.output(3, True)
     GPIO.output(5, False)
@@ -122,7 +148,11 @@ def speed(x):
 
 
 setup()
+<<<<<<< HEAD
 Gamepad.init()
+=======
+#Gamepad.__init__(XboxOne)
+>>>>>>> 43d91ba4bb741748abace786ad27114a7722a92c
 # PWM Enabled @ 0%
 pwm_a.start(0)
 pwm_b.start(0)
@@ -130,6 +160,7 @@ GPIO.output(Motor_A_EN, True)
 GPIO.output(Motor_B_EN, True)
 
 getch = getGetch._Getch()
+<<<<<<< HEAD
 
 
 ## FOR FUTURE XBOX ONE CONTROLLER CONNECTIVITY
@@ -161,6 +192,8 @@ def is_connected():  # asyncronus read-out of events
 
 connect()
 
+=======
+>>>>>>> 43d91ba4bb741748abace786ad27114a7722a92c
 screen = curses.initscr()
 curses.noecho()
 curses.cbreak()
@@ -197,9 +230,13 @@ try:
 
 finally:
     # Close down curses properly,  turn echo back on!
+<<<<<<< HEAD
     curses.nocbreak()
     screen.keypad(0)
     curses.echo()
+=======
+    curses.nocbreak();screen.keypad(0);curses.echo()
+>>>>>>> 43d91ba4bb741748abace786ad27114a7722a92c
     curses.endwin()
     GPIO.cleanup()
     # END OF PROGRAM
