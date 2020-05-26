@@ -44,7 +44,6 @@ async def is_connected():  # asyncronus read-out of events
     return True
 
 
-
 async def read_gamepad_inputs():
     print("Ready to drive!!")
     while is_connected():
@@ -64,7 +63,7 @@ def removetasks(loop: object) -> object:
         task.cancel()
 
     print("Cancelling outstanding tasks")
-    ##    await asyncio.gather(*tasks, return_exceptions=True)
+    #    await asyncio.gather(*tasks, return_exceptions=True)
     loop.stop()
 
 

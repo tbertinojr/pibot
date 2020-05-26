@@ -22,11 +22,13 @@ Motor_B_1 = 11
 Motor_B_2 = 13
 # Dir_forward   = 0
 # Dir_backward  = 1
+pwm_a = None
+pwm_b = None
+
 allGPIO_list = (3, 5, 7, 11, 13, 15)
 
 
 def setup():  # Motor initialization
-    global pwm_A, pwm_B
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(Motor_A_EN, GPIO.OUT)
@@ -35,11 +37,10 @@ def setup():  # Motor initialization
     GPIO.setup(Motor_A_2, GPIO.OUT)
     GPIO.setup(Motor_B_1, GPIO.OUT)
     GPIO.setup(Motor_B_2, GPIO.OUT)
-    pwm_A = 0
-    pwm_B = 0
+
     try:
-        pwm_A = GPIO.PWM(Motor_A_EN, 250)  # Set Pin 7 to PWM / Set PWM freq
-        pwm_B = GPIO.PWM(Motor_B_EN, 250)  # Set Pin 15 to PWM / Set Freq
+        pwm_a = GPIO.PWM(Motor_A_EN, 250)  # Set Pin 7 to PWM / Set PWM freq
+        pwm_b = GPIO.PWM(Motor_B_EN, 250)  # Set Pin 15 to PWM / Set Freq
     except:
         pass
 
@@ -49,8 +50,8 @@ def forward(x):  # Forward Continuous
     GPIO.output(3, False)
     GPIO.output(11, True)
     GPIO.output(13, False)
-    pwm_A.ChangeDutyCycle(100)  # PWM_A & PWM_B DIFFERENT CYCLES TO TRY AND MATCH SPEED
-    pwm_B.ChangeDutyCycle(80)  # WOULD LIKE TO REPLACE CURRENT DC MOTORS WITH SERVO OR
+    pwm_a.ChangeDutyCycle(100)  # pwm_a & pwm_b DIFFERENT CYCLES TO TRY AND MATCH SPEED
+    pwm_b.ChangeDutyCycle(80)  # WOULD LIKE TO REPLACE CURRENT DC MOTORS WITH SERVO OR
     sleep(x)  # ADD ENCODER FOR SYNC FEEDBACK
 
 
@@ -59,8 +60,8 @@ def reverse(x):  # Reverse Continuous
     GPIO.output(5, False)
     GPIO.output(13, True)
     GPIO.output(11, False)
-    pwm_A.ChangeDutyCycle(100)
-    pwm_B.ChangeDutyCycle(80)
+    pwm_a.ChangeDutyCycle(100)
+    pwm_b.ChangeDutyCycle(80)
     sleep(x)
 
 
@@ -69,8 +70,8 @@ def left():  # Short Left Turn, Then Sleep
     GPIO.output(3, False)
     GPIO.output(13, True)
     GPIO.output(11, False)
-    pwm_A.ChangeDutyCycle(100)
-    pwm_B.ChangeDutyCycle(100)
+    pwm_a.ChangeDutyCycle(100)
+    pwm_b.ChangeDutyCycle(100)
     sleep(0.175)
     GPIO.output(allGPIO_list, False)
 
@@ -80,8 +81,8 @@ def right():  # Short Right Turn, Then Sleep
     GPIO.output(5, False)
     GPIO.output(11, True)
     GPIO.output(13, False)
-    pwm_A.ChangeDutyCycle(100)
-    pwm_B.ChangeDutyCycle(100)
+    pwm_a.ChangeDutyCycle(100)
+    pwm_b.ChangeDutyCycle(100)
     sleep(0.175)
     stopAll()
 
@@ -91,8 +92,8 @@ def left_ninety():
     GPIO.output(3, False)
     GPIO.output(13, True)
     GPIO.output(11, False)
-    pwm_A.ChangeDutyCycle(100)
-    pwm_B.ChangeDutyCycle(100)
+    pwm_a.ChangeDutyCycle(100)
+    pwm_b.ChangeDutyCycle(100)
     sleep(0.85)
     stopAll()
 
@@ -102,29 +103,29 @@ def nineT_right():
     GPIO.output(5, False)
     GPIO.output(11, True)
     GPIO.output(13, False)
-    pwm_A.ChangeDutyCycle(100)
-    pwm_B.ChangeDutyCycle(100)
+    pwm_a.ChangeDutyCycle(100)
+    pwm_b.ChangeDutyCycle(100)
     sleep(0.85)
     stopAll()
 
 
 def stopAll():
-    pwm_A.ChangeDutyCycle(0)
-    pwm_B.ChangeDutyCycle(0)
+    pwm_a.ChangeDutyCycle(0)
+    pwm_b.ChangeDutyCycle(0)
     GPIO.output(allGPIO_list, False)
 
 
 def speed(x):
-    pwm_A.ChangeDutyCycle(x)
-    pwm_B.ChangeDutyCycle(x)
+    pwm_a.ChangeDutyCycle(x)
+    pwm_b.ChangeDutyCycle(x)
     return speed(x)
 
 
 setup()
 Gamepad.init()
 # PWM Enabled @ 0%
-pwm_A.start(0)
-pwm_B.start(0)
+pwm_a.start(0)
+pwm_b.start(0)
 GPIO.output(Motor_A_EN, True)
 GPIO.output(Motor_B_EN, True)
 
@@ -158,12 +159,14 @@ def is_connected():  # asyncronus read-out of events
     return True
 
 
+connect()
+
 screen = curses.initscr()
 curses.noecho()
 curses.cbreak()
 screen.keypad(True)
 
-#DRIVE COMMANDS INPUT FROM KEYBOARD
+# DRIVE COMMANDS INPUT FROM KEYBOARD
 try:
     while True:
         char = screen.getch()
