@@ -121,6 +121,7 @@ def speed(x):
 
 
 setup()
+Gamepad.init()
 # PWM Enabled @ 0%
 pwm_A.start(0)
 pwm_B.start(0)
