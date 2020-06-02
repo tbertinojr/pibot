@@ -30,6 +30,23 @@ Motor_B_2 = 13
 allGPIO_list = (3, 5, 7, 11, 13, 15)
 
 
+
+def Motor_A_FWD():
+    GPIO.output(11, True)
+    GPIO.output(13, False)
+
+def Motor_B_FWD(): 
+    GPIO.output(3, False)
+    GPIO.output(5, True)
+
+def Motor_A_REV():
+    GPIO.output(13, True)
+    GPIO.output(11, False)
+
+def Motor_B_REV():
+    GPIO.output(3, True)
+    GPIO.output(5, False)
+
 def setup():  # Motor initialization
     global pwm_a, pwm_b
     GPIO.setwarnings(False)
@@ -49,43 +66,40 @@ def setup():  # Motor initialization
 
 
 def forward(x):  # Forward Continuous
-    GPIO.output(5, True)
-    GPIO.output(3, False)
-    GPIO.output(11, True)
-    GPIO.output(13, False)
-    pwm_a.ChangeDutyCycle(100)  # pwm_a & pwm_b DIFFERENT CYCLES TO TRY AND MATCH SPEED
-    pwm_b.ChangeDutyCycle(80)  # WOULD LIKE TO REPLACE CURRENT DC MOTORS WITH SERVO OR
+    Motor_A_FWD()
+    Motor_B_FWD()
+    speed()
     sleep(x)  # ADD ENCODER FOR SYNC FEEDBACK
 
+def test():
+    Motor_B_FWD()
+    pwm_b.ChangeDutyCycle(80)
+    sleep(1.5)
+    stopAll()
+    Motor_B_REV()
+    pwm_b.ChangeDutyCycle(80)
+    sleep(1.5)
+    stopAll()
 
 def reverse(x):  # Reverse Continuous
-    GPIO.output(3, True)
-    GPIO.output(5, False)
-    GPIO.output(13, True)
-    GPIO.output(11, False)
-    pwm_a.ChangeDutyCycle(100)
-    pwm_b.ChangeDutyCycle(80)
+    Motor_A_REV()
+    Motor_B_REV()
+    speed()
     sleep(x)
 
 
 def left():  # Short Left Turn, Then Sleep
-    GPIO.output(5, True)
-    GPIO.output(3, False)
-    GPIO.output(13, True)
-    GPIO.output(11, False)
-    pwm_a.ChangeDutyCycle(100)
-    pwm_b.ChangeDutyCycle(100)
+    Motor_A_REV()
+    Motor_B_FWD()    
+    speed()
     sleep(0.175)
     GPIO.output(allGPIO_list, False)
 
 
-def right():  # Short Right Turn, Then Sleep
-    GPIO.output(3, True)
-    GPIO.output(5, False)
-    GPIO.output(11, True)
-    GPIO.output(13, False)
-    pwm_a.ChangeDutyCycle(100)
-    pwm_b.ChangeDutyCycle(100)
+def right():  # Short Right Turn, Then Sleep  
+    Motor_A_FWD()
+    Motor_B_REV()    
+    speed()
     sleep(0.175)
     stopAll()
 
@@ -95,8 +109,7 @@ def left_ninety():
     GPIO.output(3, False)
     GPIO.output(13, True)
     GPIO.output(11, False)
-    pwm_a.ChangeDutyCycle(100)
-    pwm_b.ChangeDutyCycle(100)
+    speed()
     sleep(0.85)
     stopAll()
 
@@ -106,22 +119,20 @@ def nineT_right():
     GPIO.output(5, False)
     GPIO.output(11, True)
     GPIO.output(13, False)
-    pwm_a.ChangeDutyCycle(100)
-    pwm_b.ChangeDutyCycle(100)
+    speed()
     sleep(0.85)
     stopAll()
 
 
 def stopAll():
-    pwm_a.ChangeDutyCycle(0)
-    pwm_b.ChangeDutyCycle(0)
+   # pwm_a.ChangeDutyCycle(0)
+   # pwm_b.ChangeDutyCycle(0) Test to remove
     GPIO.output(allGPIO_list, False)
 
 
-def speed(x):
-    pwm_a.ChangeDutyCycle(x)
-    pwm_b.ChangeDutyCycle(x)
-    return speed(x)
+def speed():
+    pwm_a.ChangeDutyCycle(100)
+    pwm_b.ChangeDutyCycle(80)
 
 
 setup()
@@ -166,7 +177,8 @@ try:
             left_ninety()
         elif char == ord('2'):
             nineT_right()
-
+        elif char == ord('t'):
+            test()
 finally:
     # Close down curses properly,  turn echo back on!
     curses.nocbreak();screen.keypad(0);curses.echo()
