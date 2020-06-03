@@ -18,15 +18,7 @@ import asyncio
 import getGetch
 #import Controllers
 
-Motor_A_EN = 7  # GPIO BORAD PIN 7
-Motor_B_EN = 15  # GPIO BOARD PIN 15
-Motor_A_1 = 3
-Motor_A_2 = 5
-Motor_B_1 = 11
-Motor_B_2 = 13
-
-
-allGPIO_list = (3, 5, 7, 11, 13, 15)
+allGPIO_list = [3, 5, 7, 11, 13, 15]
 
 Motor_A_EN = 7  # GPIO BORAD PIN 7
 Motor_B_EN = 15  # GPIO BOARD PIN 15
@@ -34,14 +26,8 @@ Motor_A_1 = 3
 Motor_A_2 = 5
 Motor_B_1 = 11
 Motor_B_2 = 13
-# Dir_forward   = 0
-# Dir_backward  = 1
 pwm_a = None
 pwm_b = None
-
-allGPIO_list = (3, 5, 7, 11, 13, 15)
-
-
 
 
 def Motor_A_FWD():
@@ -133,7 +119,8 @@ def speed():
 
 
 setup()
-#Gamepad.__init__(XboxOne)
+gp = Gamepad
+gp.__init__( XboxOne )
 # PWM Enabled @ 0%
 pwm_a.start(0)
 pwm_b.start(0)
