@@ -1,4 +1,4 @@
-import array
+
 import curses
 import os
 import struct
