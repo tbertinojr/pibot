@@ -119,8 +119,8 @@ def speed():
 
 
 setup()
-gp = Gamepad
-gp.__init__( XboxOne )
+#gp = Gamepad
+#gp.__init__( XboxOne )
 # PWM Enabled @ 0%
 pwm_a.start(0)
 pwm_b.start(0)
@@ -158,6 +158,18 @@ screen = curses.initscr()
 curses.noecho()
 curses.cbreak()
 screen.keypad(True)
+
+###Testing Block#############
+
+joy=Gamepad.gamepad()
+
+
+
+
+
+
+#############################
+
 
 # DRIVE COMMANDS INPUT FROM KEYBOARD
 try:
