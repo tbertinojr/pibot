@@ -166,7 +166,7 @@ def is_connected():  # asyncronus read-out of events
 screen = curses.initscr()
 # curses.noecho()
 curses.cbreak()
-creen.keypad( True )
+screen.keypad( True )
 
 ###Testing Block#############
 
