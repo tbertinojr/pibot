@@ -171,12 +171,14 @@ screen.keypad( True )
 ###Testing Block#############
 
 joy = GP.gamepad
-
-assert isinstance( joy.gamepad, object )
-xboxJS = joy.gamepad
-xbosJS.rumble()
-xboxJS.earase_rumble()
-xboxJS.read_gamepad_input()
+try:
+    assert isinstance( joy.gamepad, object )
+    xboxJS = joy.gamepad
+    xbosJS.rumble()
+    xboxJS.earase_rumble()
+    xboxJS.read_gamepad_input()
+except:
+    pass
 #############################
 
 
