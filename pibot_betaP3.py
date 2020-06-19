@@ -164,7 +164,7 @@ def is_connected():  # asyncronus read-out of events
 
 
 screen = curses.initscr()
-curses.noecho()
+#curses.noecho()
 curses.cbreak()
 screen.keypad( True )
 
@@ -177,6 +177,7 @@ try:
     xbosJS.rumble()
     xboxJS.earase_rumble()
     xboxJS.read_gamepad_input()
+    print('Code Passed')
 except:
     pass
 #############################
@@ -216,7 +217,7 @@ finally:
     # Close down curses properly,  turn echo back on!
     curses.nocbreak();
     screen.keypad( 0 );
-    curses.echo()
+   # curses.echo()
     curses.endwin()
     GPIO.cleanup()
     # END OF PROGRAM
