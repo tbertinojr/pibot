@@ -215,9 +215,9 @@ try:
             test()
 finally:
     # Close down curses properly,  turn echo back on!
-    #  curses.nocbreak();
-    #  screen.keypad( 0 );
+    curses.nocbreak();
+    screen.keypad( 0 );
     curses.echo()
-    #  curses.endwin()
+    curses.endwin()
     GPIO.cleanup()
     # END OF PROGRAM
