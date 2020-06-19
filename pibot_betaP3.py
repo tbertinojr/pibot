@@ -170,6 +170,7 @@ screen.keypad( True )
 
 ###Testing Block#############
 
+print('Trying GP Code Block')
 joy = GP.gamepad
 try:
     assert isinstance( joy.gamepad, object )
