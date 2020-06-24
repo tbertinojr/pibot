@@ -4,6 +4,7 @@ Standard gamepad mappings.
 
 Pulled in to Gamepad.py directly.
 """
+import Gamepad
 
 ##class PS3(Gamepad):
 ##    fullName = 'PlayStation 3 controller'

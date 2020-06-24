@@ -3,22 +3,19 @@
 import time
 from time import sleep
 from typing import Tuple
-
 import RPi.GPIO as GPIO
 import curses
 import sys, tty, termios
-
 sys.path.append( "/usr/lib/python3/dist-packages" )
 sys.path.append( "/home/pi/pibot/pibot" )
-import gamepad
 import Gamepad as GP
 import os, struct, array
 from fcntl import ioctl
-from evdev import ecodes, InputDevice, ff, util
+from evdev import ecodes, InputDevice, ff, util, list_devices
 import asyncio
 import getGetch
+import gamepad
 
-# import Controllers
 
 allGPIO_list = [3, 5, 7, 11, 13, 15]
 
@@ -126,41 +123,19 @@ def speed():
 
 
 setup()
-# gp = Gamepad
+
 # PWM Enabled @ 0%
 pwm_a.start( 0 )
 pwm_b.start( 0 )
 GPIO.output( Motor_A_EN, True )
 GPIO.output( Motor_B_EN, True )
 
-getch = getGetch._Getch()
+getch = getGetch._Getch()  #getch obj for recieving keyboard input
 
 
 ## FOR FUTURE XBOX ONE CONTROLLER CONNECTIVITY
-def connect():  # asyncronus read-out of events
-    xbox_path = None
-    remote_control = None
-    devices = [InputDevice( path ) for path in list_devices()]
-    print( 'Connecting to xbox controller...' )
-    for device in devices:
-        if str.lower( device.name ) == 'xbox wireless controller':
-            xbox_path = str( device.path )
-            remote_control = gamepad.gamepad( file=xbox_path )
-            remote_control.rumble_effect = 2
-            return remote_control
-    return None
 
 
-def is_connected():  # asyncronus read-out of events
-    path = None
-    devices = [InputDevice( path ) for path in list_devices()]
-    for device in devices:
-        if str.lower( device.name ) == 'xbox wireless controller':
-            path = str( device.path )
-    if (path == None):
-        print( 'Xbox controller disconnected!!' )
-        return False
-    return True
 
 
 screen = curses.initscr()
@@ -170,17 +145,52 @@ screen.keypad( True )
 
 ###Testing Block#############
 
-print('Trying GP Code Block')
-joy = GP.gamepad
+
+def connect_gamepad():  # asyncronus read-out of events
+    xbox_path = None
+    remote_control = None
+    devices = [InputDevice(path) for path in list_devices()]
+    print('Connecting to xbox controller...')
+    for device in devices:
+        if str.lower(device.name) == "xbox wireless controller":
+            xbox_path = str(device.path)
+            remote_control = gamepad.gamepad(file=xbox_path)
+            remote_control.rumble_effect = 2
+            return remote_control
+    return None
+
+
+def is_gamepad_connected():  # asyncronus read-out of events
+    xbox_path = None
+    devices = [InputDevice(path) for path in list_devices()]
+    for device in devices:
+        if str.lower(device.name) == "xbox wireless controller":
+            xbox_path = str(device.path)
+            for i in range(5):
+                print("CONNECTED")
+                sleep(.2)
+            sleep(5)
+    if xbox_path is None:
+        print("Xbox controller disconnected!!")
+        sleep(5)
+        return False
+    return True
+
+connect_gamepad()
+is_gamepad_connected()
+print('GP Code Block')
+joy = GP.gamepad()
 try:
-    assert isinstance( joy.gamepad, object )
+    #assert isinstance( joy.gamepad, object )
     xboxJS = joy.gamepad
     xbosJS.rumble()
     xboxJS.earase_rumble()
     xboxJS.read_gamepad_input()
-    print( 'Code Passed' )
+
 except:
     pass
+
+
 #############################
 
 

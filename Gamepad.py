@@ -6,8 +6,8 @@ from evdev import InputDevice, ecodes, ff, list_devices
 
 
 class gamepad():
-    def __init__(self, file='/dev/input/js0'):
-        # self.event_value = 0
+    def __init__(self, file='/dev/input/event0'):
+        self.event_value = 0
         self.power_on = True
         self.device_file = InputDevice( file )
         self.joystick_left_y = 0  # values are mapped to [-1 ... 1]
@@ -146,4 +146,5 @@ class gamepad():
             await asyncio.sleep( 0.2 )
 
     def erase_rumble(self):
-        self.device_file.erase_effect( self.effect1_id )
+        self.device_file.erase_effect( self.effect1_id)
+
