@@ -15,120 +15,15 @@ from evdev import ecodes, InputDevice, ff, util, list_devices
 import asyncio
 import getGetch
 import gamepad
+import signal
+import pbot_setup
 
 
-allGPIO_list = [3, 5, 7, 11, 13, 15]
-
-Motor_A_EN = 7  # GPIO BORAD PIN 7
-Motor_B_EN = 15  # GPIO BOARD PIN 15
-Motor_A_1 = 3
-Motor_A_2 = 5
-Motor_B_1 = 11
-Motor_B_2 = 13
-pwm_a = None
-pwm_b = None
+pbot = pbot_setup
+pbot.setup()
+pbot.pwm_start()
 
 
-def Motor_A_FWD():
-    GPIO.output( 11, True )
-    GPIO.output( 13, False )
-
-
-def Motor_B_FWD():
-    GPIO.output( 3, False )
-    GPIO.output( 5, True )
-
-
-def Motor_A_REV():
-    GPIO.output( 13, True )
-    GPIO.output( 11, False )
-
-
-def Motor_B_REV():
-    GPIO.output( 3, True )
-    GPIO.output( 5, False )
-
-
-def setup():  # Motor initialization
-    global pwm_a, pwm_b
-    GPIO.setwarnings( False )
-    GPIO.setmode( GPIO.BOARD )
-    GPIO.setup( Motor_A_EN, GPIO.OUT )
-    GPIO.setup( Motor_B_EN, GPIO.OUT )
-    GPIO.setup( Motor_A_1, GPIO.OUT )
-    GPIO.setup( Motor_A_2, GPIO.OUT )
-    GPIO.setup( Motor_B_1, GPIO.OUT )
-    GPIO.setup( Motor_B_2, GPIO.OUT )
-
-    try:
-        pwm_a = GPIO.PWM( Motor_A_EN, 250 )  # Set Pin 7 to PWM / Set PWM freq
-        pwm_b = GPIO.PWM( Motor_B_EN, 250 )  # Set Pin 15 to PWM / Set Freq
-    except:
-        pass
-
-
-def forward(x):  # Forward Continuous
-    Motor_A_FWD()
-    Motor_B_FWD()
-    speed()
-    sleep( x )  # ADD ENCODER FOR SYNC FEEDBACK
-
-
-def reverse(x):  # Reverse Continuous
-    Motor_A_REV()
-    Motor_B_REV()
-    speed()
-    sleep( x )
-
-
-def left():  # Short Left Turn, Then Sleep
-    Motor_A_REV()
-    Motor_B_FWD()
-    speed()
-    sleep( 0.175 )
-    GPIO.output( allGPIO_list, False )
-
-
-def right():  # Short Right Turn, Then Sleep  
-    Motor_A_FWD()
-    Motor_B_REV()
-    speed()
-    sleep( 0.175 )
-    stopAll()
-
-
-def left_ninety():  # Turn Left 90 degrees
-    Motor_A_REV()
-    Motor_B_FWD()
-    speed()
-    sleep( 0.85 )
-    stopAll()
-
-
-def nineT_right():  # turn right 90 degrees
-    Motor_A_FWD()
-    Motor_B_REV()
-    speed()
-    sleep( 0.85 )
-    stopAll()
-
-
-def stopAll():
-    GPIO.output( allGPIO_list, False )
-
-
-def speed():
-    pwm_a.ChangeDutyCycle( 100 )
-    pwm_b.ChangeDutyCycle( 80 )
-
-
-setup()
-
-# PWM Enabled @ 0%
-pwm_a.start( 0 )
-pwm_b.start( 0 )
-GPIO.output( Motor_A_EN, True )
-GPIO.output( Motor_B_EN, True )
 
 getch = getGetch._Getch()  #getch obj for recieving keyboard input
 
@@ -137,14 +32,21 @@ getch = getGetch._Getch()  #getch obj for recieving keyboard input
 
 
 
-
-screen = curses.initscr()
-# curses.noecho()
-curses.cbreak()
-screen.keypad( True )
-
 ###Testing Block#############
 
+async def removetasks(loop):
+    tasks = [t for t in asyncio.all_tasks() if t is not
+             asyncio.current_task()]
+
+    for task in tasks:
+        # skipping over shielded coro still does not help
+        if task._coro.__name__ == "cant_stop_me":
+            continue
+        task.cancel()
+
+    print("Cancelling outstanding tasks")
+    await asyncio.gather(*tasks, return_exceptions=True)
+    loop.stop()
 
 def connect_gamepad():  # asyncronus read-out of events
     xbox_path = None
@@ -166,33 +68,52 @@ def is_gamepad_connected():  # asyncronus read-out of events
     for device in devices:
         if str.lower(device.name) == "xbox wireless controller":
             xbox_path = str(device.path)
-            for i in range(5):
-                print("CONNECTED")
-                sleep(.2)
-            sleep(5)
     if xbox_path is None:
         print("Xbox controller disconnected!!")
-        sleep(5)
         return False
     return True
 
-connect_gamepad()
-is_gamepad_connected()
-print('GP Code Block')
-joy = GP.gamepad()
-try:
-    #assert isinstance( joy.gamepad, object )
-    xboxJS = joy.gamepad
-    xbosJS.rumble()
-    xboxJS.earase_rumble()
-    xboxJS.read_gamepad_input()
 
-except:
-    pass
+def update(old, new, max_delta=0.3):
+    if abs(old - new) <= max_delta:
+        res = new
+    else:
+        res = 0.0
+    return res
 
 
+async def read_gamepad_inputs():
+    print("Ready to roooll!!")
+    while  is_gamepad_connected():
+        await asyncio.sleep(5e-3)
+    return
+
+remote_control = None
+loop = asyncio.get_event_loop()
+signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+
+for s in signals:
+    loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown_signal(s, loop)))
+    try:
+        remote_control = connect_gamepad()
+        if remote_control is None:
+            print('Please connect an Xbox controller then restart the program!')
+            sys.exit()
+
+        remote_control.rumble_effect = 2
+        tasks = [remote_control.read_gamepad_input(), remote_control.rumble(), read_gamepad_inputs()]
+        loop.run_until_complete(asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED))
+        loop.run_until_complete(removetasks(loop))
+    except:
+        print('Exiting Program')
+        sys.exit()
+        GPIO.cleanup()
+    finally:
+        GPIO.cleanup()
 #############################
 
+screen = curses.initscr()
+screen.keypad( True )
 
 # DRIVE COMMANDS INPUT FROM KEYBOARD
 try:
@@ -201,13 +122,13 @@ try:
         if char == ord( 'q' ):
             break
         elif char == curses.KEY_UP:
-            forward( 0.1 )
+            pbot.forward()
         elif char == curses.KEY_DOWN:
-            reverse( 0.1 )
+            pbot.reverse()
         elif char == curses.KEY_RIGHT:
-            right()
+            pbot.right()
         elif char == curses.KEY_LEFT:
-            left()
+            pbot.left()
         elif char == ord( 'w' ):
             forward( 0.1 )
         elif char == ord( 's' ):
@@ -222,13 +143,10 @@ try:
             left_ninety()
         elif char == ord( '2' ):
             nineT_right()
-        elif char == ord( 't' ):
-            test()
+    
 finally:
     # Close down curses properly,  turn echo back on!
-    curses.nocbreak();
     screen.keypad( 0 );
-    curses.echo()
     curses.endwin()
     GPIO.cleanup()
     # END OF PROGRAM

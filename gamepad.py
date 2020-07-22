@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
+import pbot_setup
 import asyncio
 
 from evdev import InputDevice, ecodes, ff, list_devices
 
+pbot = pbot_setup
 
 class gamepad():
-    def __init__(self, file='/dev/input/js0'):
+    def __init__(self, file='/dev/input/event0'):
         # self.event_value = 0
         self.power_on = True
         self.device_file = InputDevice( file )
@@ -20,6 +22,7 @@ class gamepad():
         self.button_y = False
         self.button_b = False
         self.button_a = False
+        self.dpad = False
         self.dpad_up = False
         self.dpad_down = False
         self.dpad_left = False
@@ -59,7 +62,7 @@ class gamepad():
         async for event in self.device_file.async_read_loop():
             if not (self.power_on):  # stop reading device when power_on = false
                 break
-            print(str(event.type) + ' ' + str(event.code) + ' ' + str(event.value))
+            # print(str(event.type) + ' ' + str(event.code) + ' ' + str(event.value))
             if event.type == 3:  # type is analog trigger or joystick
                 if event.code == 1:  # left joystick y-axis
                     if -event.value > uncertainty_joystick_left_y:
@@ -101,11 +104,13 @@ class gamepad():
                     self.trigger_right = event.value / max_trigger
                 elif event.code == 2:  # left trigger
                     self.trigger_left = event.value / max_trigger
-                elif event.code == 16:  # right trigger
+                elif event.code == 16:  # DPAD
                     if (event.value == -1):
+                        pbot.left()
                         self.dpad_left = True
                         self.dpad_right = False
                     elif (event.value == 1):
+                        pbot.right()
                         self.dpad_left = False
                         self.dpad_right = True
                     else:
@@ -113,9 +118,11 @@ class gamepad():
                         self.dpad_right = False
                 elif event.code == 17:  # left trigger
                     if (event.value == -1):
+                        pbot.forward()
                         self.dpad_up = True
                         self.dpad_down = False
                     elif (event.value == 1):
+                        pbot.reverse()
                         self.dpad_up = False
                         self.dpad_down = True
                     else:
@@ -123,17 +130,28 @@ class gamepad():
                         self.dpad_down = False
             if (event.type == 1):  # type is button
                 if event.code == 304:  # button "A" pressed ?
+                    print("A Pressed")###########added
+                    pbot.reverse()
                     self.button_a = True
                 if event.code == 307:  # button "X" pressed ?
                     self.button_x = True
+                    print("X Pressed")###########added
                 if event.code == 308:  # button "Y" pressed ?
+                    pbot.forward()
                     self.button_y = True
+                    print("Y Pressed")###########added
                 if event.code == 305:  # button "B" pressed ?
+                    pbot.stopAll()
                     self.button_b = True
+                    print("B Pressed")###########added
                 if event.code == 311:  # bumper "right" pressed ?
                     self.bump_right = True if event.value == 1 else False
+                    pbot.right_F()
+                    print("Right Bumper Pressed")###########added
                 if event.code == 310:  # bumper "left" pressed ?
                     self.bump_left = True if event.value == 1 else False
+                    pbot.left_F()
+                    print("Left Bumper Pressed")###########added
 
     async def rumble(self):  # asyncronus control of force feed back effects
         repeat_count = 1
