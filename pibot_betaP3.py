@@ -119,32 +119,32 @@ screen.keypad( True )
 
 # DRIVE COMMANDS INPUT FROM KEYBOARD
 try:
-    # while True:
-    #     char = screen.getch()
-    #     if char == ord( 'q' ):
-    #         break
-    #     elif char == curses.KEY_UP:
-    #         pbot.forward()
-    #     elif char == curses.KEY_DOWN:
-    #         pbot.reverse()
-    #     elif char == curses.KEY_RIGHT:
-    #         pbot.right()
-    #     elif char == curses.KEY_LEFT:
-    #         pbot.left()
-    #     elif char == ord( 'w' ):
-    #         forward( 0.1 )
-    #     elif char == ord( 's' ):
-    #         reverse( 0.1 )
-    #     elif char == ord( 'd' ):
-    #         right()
-    #     elif char == ord( 'a' ):
-    #         left()
-    #     elif char == ord( 'l' ):
-    #         stopAll()
-    #     elif char == ord( '1' ):
-    #         left_ninety()
-    #     elif char == ord( '2' ):
-    #         nineT_right()
+    while True:
+        char = screen.getch()
+        if char == ord( 'q' ):
+            break
+        elif char == curses.KEY_UP:
+            pbot.forward()
+        elif char == curses.KEY_DOWN:
+            pbot.reverse()
+        elif char == curses.KEY_RIGHT:
+            pbot.right()
+        elif char == curses.KEY_LEFT:
+            pbot.left()
+        elif char == ord( 'w' ):
+            forward( 0.1 )
+        elif char == ord( 's' ):
+            reverse( 0.1 )
+        elif char == ord( 'd' ):
+            right()
+        elif char == ord( 'a' ):
+            left()
+        elif char == ord( 'l' ):
+            stopAll()
+        elif char == ord( '1' ):
+            left_ninety()
+        elif char == ord( '2' ):
+            nineT_right()
     
 finally:
     # Close down curses properly,  turn echo back on!
